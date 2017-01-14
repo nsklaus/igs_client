@@ -8,7 +8,7 @@ status: pre-alpha, work in progress
 <img src=https://github.com/nsklaus/igs_client/blob/master/screenshot.png?raw=true width=200 height=300>   
    
 #sample commands from igs:
-game number is 15  
+game number is 1  
 turn number is 82 then 83  
 black choose position T9  
 white choose position D7  
