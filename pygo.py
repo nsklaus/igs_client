@@ -4,6 +4,7 @@ import tkinter
 from tkinter import *
 from tkinter import ttk
 import os
+import re
 
 class App(object):
 
@@ -18,7 +19,7 @@ class App(object):
         self.root.title('go client')
         self.site_name = StringVar()
 
-        self.letter_list = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t']
+        self.letter_list = ['A','B','C','D','E','F','G','H','J','K','L','M','N','O','P','Q','R','S','T']
 
         self.im_goban=PhotoImage(file="images/goban2.png")
         self.im_white=PhotoImage(file="images/white.png")
@@ -29,6 +30,7 @@ class App(object):
         self.canvas.create_image(goban_width/2,goban_height/2,image=self.im_goban)
 
         self.entry_name = ttk.Entry(self.root, text=self.site_name, width=50)
+        self.entry_name.insert(END, '15  83(W): D7')
         self.entry_name.place( x = 50, y = goban_height+20)
 
 
@@ -38,12 +40,30 @@ class App(object):
 
     def move_stone(self):
         move_coords = self.entry_name.get()
-        print("coords={}".format(move_coords))
-        print(self.letter_list.index(move_coords))
-        posx=self.letter_list.index(move_coords)*20
-        # stone(color='black',x=15,y=52)
-        self.canvas.create_image(posx,100,image=self.im_black)
+        #print("coords={}".format(move_coords))
+        #print("letter_index=",self.letter_list.index(move_coords))
+        
+        #posx=self.letter_list.index(move_coords)*20
+        # 15  83(W): D7
+        get_letter = (re.findall(r'([A-Z])',move_coords)[-1])
+        get_pos_x  = self.letter_list.index(get_letter)
+        get_pos_y  = (re.findall(r'(\d+)',move_coords)[-1])
+        get_color  = (re.findall(r'([A-Z])',move_coords)[-2])
+        
+        print("pos_x =",get_pos_x,"posx_type=",get_pos_x)
+        print("pos_y =",get_pos_y,"posy_type=",get_pos_y)
 
+        rel_pos_x = 33+(int(get_pos_x)*23)
+        rel_pos_y = 469-(int(get_pos_y)*23)#32+(int(get_pos_y)*23)
+
+        print("pos_x =",rel_pos_x,"posx_type=",get_pos_x)
+        print("pos_y =",rel_pos_y,"posy_type=",get_pos_y)
+        print("color =",get_color)
+
+        if get_color is 'B':
+            self.canvas.create_image(rel_pos_x, rel_pos_y,image=self.im_black)
+        if get_color is 'W':
+            self.canvas.create_image(rel_pos_x, rel_pos_y,image=self.im_white)
 
 class stone(object):
     
