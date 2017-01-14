@@ -2,7 +2,7 @@
 a go client for igs, made with python, tkinter, ttk  
 igs uses telnet, transmit data in clear.  
 this program will read telnet output and reproduce command on the UI.  
-  
+first goal is to make it able to observe other's games.    
 status: pre-alpha, work in progress  
   
 <img src=https://github.com/nsklaus/igs_client/blob/master/screenshot.png?raw=true width=200 height=300>   
