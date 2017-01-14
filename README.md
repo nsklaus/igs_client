@@ -10,15 +10,15 @@ status: pre-alpha, work in progress
 #sample commands from igs:
 game number is 15  
 turn number is 82 then 83  
-black choose position T9
-white choose position D7
-
-1 8
-15 Game 1 I: alfred (0 559 24) vs maxwell (0 220 11)
-15  82(B): T9
-
-1 8
-15 Game 1 I: alfred (0 545 23) vs maxwell (0 220 11)
-15  83(W): D7
-
+black choose position T9  
+white choose position D7  
+<pre>  
+1 8  
+15 Game 1 I: alfred (0 559 24) vs maxwell (0 220 11)  
+15  82(B): T9  
+  
+1 8  
+15 Game 1 I: alfred (0 545 23) vs maxwell (0 220 11)  
+15  83(W): D7  
+</pre>
 
