@@ -3,6 +3,7 @@
 import tkinter
 from tkinter import *
 from tkinter import ttk
+from PIL import Image, ImageTk
 import os
 import re
 
@@ -18,13 +19,14 @@ class App(object):
         self.style.theme_use('clam')
         self.root.title('go client')
         self.site_name = StringVar()
+        self.mydict = {}
 
         self.letter_list = ['A','B','C','D','E','F','G','H','J','K','L','M','N','O','P','Q','R','S','T']
 
         self.im_goban=PhotoImage(file="images/goban2.png")
         self.im_white=PhotoImage(file="images/white.png")
         self.im_black=PhotoImage(file="images/black.png")
-
+        
         goban_width = (self.im_goban.width())
         goban_height = (self.im_goban.height())
         self.canvas.create_image(goban_width/2,goban_height/2,image=self.im_goban)
@@ -36,46 +38,53 @@ class App(object):
 
         button_enter = ttk.Button(self.root,  text='ok')
         button_enter['command'] = self.move_stone
-        button_enter.place( x = 200, y = goban_height+60)
+        button_enter.place( x = 160, y = goban_height+60)
+
+        button_rem = ttk.Button(self.root,  text='del')
+        button_rem['command'] = self.del_stone
+        button_rem.place( x = 260, y = goban_height+60)
+
+        button_key = ttk.Button(self.root,  text='key')
+        button_key['command'] = self.get_key
+        button_key.place( x = 360, y = goban_height+60)
+
 
     def move_stone(self):
         move_coords = self.entry_name.get()
-        #print("coords={}".format(move_coords))
-        #print("letter_index=",self.letter_list.index(move_coords))
-        
-        #posx=self.letter_list.index(move_coords)*20
-        # 15  83(W): D7
         get_letter = (re.findall(r'([A-Z])',move_coords)[-1])
         get_pos_x  = self.letter_list.index(get_letter)
         get_pos_y  = (re.findall(r'(\d+)',move_coords)[-1])
         get_color  = (re.findall(r'([A-Z])',move_coords)[-2])
-        
-        print("pos_x =",get_pos_x,"posx_type=",get_pos_x)
-        print("pos_y =",get_pos_y,"posy_type=",get_pos_y)
 
         rel_pos_x = 33+(int(get_pos_x)*23)
         rel_pos_y = 469-(int(get_pos_y)*23)#32+(int(get_pos_y)*23)
 
-        print("pos_x =",rel_pos_x,"posx_type=",get_pos_x)
-        print("pos_y =",rel_pos_y,"posy_type=",get_pos_y)
-        print("color =",get_color)
+        mykey = get_letter+get_pos_y
 
-        if get_color is 'B':
-            self.canvas.create_image(rel_pos_x, rel_pos_y,image=self.im_black)
-        if get_color is 'W':
-            self.canvas.create_image(rel_pos_x, rel_pos_y,image=self.im_white)
+        if mykey in self.mydict:
+            print("already exists!")
+        else:
+            if get_color is 'B':
+                self.mydict[mykey] = self.canvas.create_image(rel_pos_x, rel_pos_y,image=self.im_black)
+            if get_color is 'W':
+                self.mydict[mykey] = self.canvas.create_image(rel_pos_x, rel_pos_y,image=self.im_white)
 
-class stone(object):
-    
-    def __init__(self,color,x,y):
-        self.im_white=PhotoImage(file="images/white.png")
-        self.im_black=PhotoImage(file="images/black.png")
-        self.canvas.create_image(100,200,image=self.im_black)
-        print("C=[{}] x=[{}] y=[{}]".format(color,x,y))
-
+    def get_key(self):
+        print("mydict_len=",len(self.mydict))
+        print("mydict=",self.mydict)
+        for key in self.mydict:
+            print("key=",key, "stuff=",self.mydict[key])
 
 
-
+    def del_stone(self):
+        move_coords = self.entry_name.get()
+        get_letter = (re.findall(r'([A-Z])',move_coords)[-1])
+        get_pos_y  = (re.findall(r'(\d+)',move_coords)[-1])
+        mykey = get_letter+get_pos_y
+        print("result2=",self.mydict[mykey])
+        self.canvas.delete(self.mydict[mykey])
+        del self.mydict[mykey]
+        pass
 
 
 app = App()
