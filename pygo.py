@@ -38,7 +38,7 @@ class App(object):
 
 
         self.label_mouse = ttk.Label(self.root, text=str(self.site_nubr))
-        self.label_mouse.place( x = 50, y = goban_height+30)
+        self.label_mouse.place( x = 50, y = goban_height+20)
 
         self.entry_name = ttk.Entry(self.root, text=self.site_name, width=40)
         self.entry_name.insert(END, '15  83(W): D7')
@@ -96,13 +96,17 @@ class App(object):
         pass
 
     def mouse_motion(self, event):
-        x, y = event.x, event.y
-        mystring=str(str(x) + "," + str(y))
-        self.site_nubr=mystring
-        self.label_mouse['text']=self.site_nubr
+        if event.x >= 32 and event.y >= 32 and event.x <=450 and event.y <=450:
+            x, y = event.x, event.y
+            res_x = str(self.letter_list[(int(x/23)-1)])
+            res_y = str(int((450 - y+8)/23)+1)
+            mystring=str( res_x + " x " + res_y )
+            self.site_nubr=mystring
+            self.label_mouse['text']=self.site_nubr
+
 
     def mouse_click(self, event):
-        print("clicked at", event.x, event.y)
+        print("clicked at", event.x, "x", event.y)
 
 app = App()
 app.root.mainloop()
