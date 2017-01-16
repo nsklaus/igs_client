@@ -14,11 +14,16 @@ class App(object):
         self.root = tkinter.Tk()
         self.canvas = Canvas(self.root, width=465, height=570)
         self.canvas.grid()
-
+        self.canvas.bind("<Button-1>", self.mouse_click)
+        self.canvas.bind('<Motion>', self.mouse_motion)
         self.style = ttk.Style()
         self.style.theme_use('clam')
         self.root.title('go client')
+
+
         self.site_name = StringVar()
+        self.site_nubr = 0
+
         self.mydict = {}
 
         self.letter_list = ['A','B','C','D','E','F','G','H','J','K','L','M','N','O','P','Q','R','S','T']
@@ -31,12 +36,16 @@ class App(object):
         goban_height = (self.im_goban.height())
         self.canvas.create_image(goban_width/2,goban_height/2,image=self.im_goban)
 
-        self.entry_name = ttk.Entry(self.root, text=self.site_name, width=50)
+
+        self.label_mouse = ttk.Label(self.root, text=str(self.site_nubr))
+        self.label_mouse.place( x = 50, y = goban_height+30)
+
+        self.entry_name = ttk.Entry(self.root, text=self.site_name, width=40)
         self.entry_name.insert(END, '15  83(W): D7')
-        self.entry_name.place( x = 50, y = goban_height+20)
+        self.entry_name.place( x = (goban_width - 300), y = goban_height+20)
 
 
-        button_enter = ttk.Button(self.root,  text='ok')
+        button_enter = ttk.Button(self.root, text='ok')
         button_enter['command'] = self.move_stone
         button_enter.place( x = 160, y = goban_height+60)
 
@@ -57,7 +66,7 @@ class App(object):
         get_color  = (re.findall(r'([A-Z])',move_coords)[-2])
 
         rel_pos_x = 33+(int(get_pos_x)*23)
-        rel_pos_y = 469-(int(get_pos_y)*23)#32+(int(get_pos_y)*23)
+        rel_pos_y = 469-(int(get_pos_y)*23)
 
         mykey = get_letter+get_pos_y
 
@@ -86,6 +95,14 @@ class App(object):
         del self.mydict[mykey]
         pass
 
+    def mouse_motion(self, event):
+        x, y = event.x, event.y
+        mystring=str(str(x) + "," + str(y))
+        self.site_nubr=mystring
+        self.label_mouse['text']=self.site_nubr
+
+    def mouse_click(self, event):
+        print("clicked at", event.x, event.y)
 
 app = App()
 app.root.mainloop()
