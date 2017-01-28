@@ -19,7 +19,9 @@ class App(object):
         self.style = ttk.Style()
         self.style.theme_use('clam')
         self.root.title('go client')
-
+        self.last_x = 0
+        self.last_y = 0
+        self.turn = True
 
         self.site_name = StringVar()
         self.site_nubr = 0
@@ -103,10 +105,26 @@ class App(object):
             mystring=str( res_x + " x " + res_y )
             self.site_nubr=mystring
             self.label_mouse['text']=self.site_nubr
+            self.last_x = res_x
+            self.last_y = res_y
 
 
     def mouse_click(self, event):
-        print("clicked at", event.x, "x", event.y)
+        print("clicked --> pixel=[{}] go=[{}]".format(str(event.x)+"x"+ str(event.y),self.last_x+self.last_y))
+        get_pos_x = self.letter_list.index(self.last_x)
+        get_pos_y = self.last_y
+        rel_pos_x = 33+(int(get_pos_x)*23)
+        rel_pos_y = 469-(int(get_pos_y)*23)
+        mykey = self.last_x+self.last_y
+
+        self.turn = not self.turn
+        if mykey in self.mydict:
+            print("already exists!")
+        else:   
+            if self.turn:
+                self.mydict[mykey] = self.canvas.create_image(rel_pos_x, rel_pos_y,image=self.im_black)
+            else:
+                self.mydict[mykey] = self.canvas.create_image(rel_pos_x, rel_pos_y,image=self.im_white)                
 
 app = App()
 app.root.mainloop()
