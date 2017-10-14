@@ -5,8 +5,8 @@ this program will read telnet output and reproduce command on the UI.
 first goal is to make it able to observe other's games.    
 status: pre-alpha, work in progress  
   
-<img src=https://github.com/nsklaus/igs_client/blob/master/screenshot.png?raw=true width=200 height=300>   
-   
+![alt text](hhttps://github.com/nsklaus/igs_client/blob/master/screenshot.png?raw=true width=200 height=300 "igs_client wip")
+
 #sample commands from igs:
 game number is 1  
 turn number is 82 then 83  
