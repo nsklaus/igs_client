@@ -4,8 +4,8 @@ igs uses telnet, transmit data in clear.
 this program will read telnet output and reproduce commands on the UI.  
 first goal is to make it able to observe other's games.    
 status: pre-alpha, work in progress  
-  
-![](https://github.com/nsklaus/igs_client/blob/master/screenshot.png)
+
+<img src="https://github.com/nsklaus/igs_client/blob/master/screenshot.png?raw=true" width="200" height="300">   
 
 #sample commands from igs:
 game number is 1  
