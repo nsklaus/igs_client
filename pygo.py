@@ -4,6 +4,7 @@ import tkinter
 from tkinter import *
 from tkinter import ttk
 import telnetlib
+
 import time
 from PIL import Image, ImageTk
 import os
@@ -28,6 +29,11 @@ class App(object):
 
         self.last_x = 0
         self.last_y = 0
+        self.res_x = 0
+        self.res_y = 0
+        self.my_coords = []
+        self.my_color = []
+        self.observe = False
         self.turn = True
 
         self.site_name = StringVar()
@@ -60,8 +66,8 @@ class App(object):
         button_enter['command'] = self.input_igs
         button_enter.place(x=160, y=goban_height + 25)
 
-        button_rem = ttk.Button(self.root, text='del')
-        button_rem['command'] = self.del_stone
+        button_rem = ttk.Button(self.root, text='clean')
+        button_rem['command'] = self.clean_board
         button_rem.place(x=260, y=goban_height + 25)
 
         button_key = ttk.Button(self.root, text='key')
@@ -74,10 +80,35 @@ class App(object):
         if len(my_buffer) > 0:
             print(self.text1.insert(INSERT, my_buffer))
             self.text1.see("end")
+
+            if self.observe:
+                # my_buffer = self.tn.read_very_eager().decode('ascii')
+                # print(re.findall(r'(?<=\(B\):)....', my_buffer))
+                # print(re.findall(r'(?<=\([B-W]\):)..\d+', my_buffer))  # find coords
+                # print(re.findall(r'([B\-W])', my_buffer))  # find color
+                # self.my_color = "B"
+                # self.my_coords.clear()
+                # self.my_coords = "J16"
+                my_coords = re.findall(r'(?<=\([B-W]\):.).\d+', my_buffer)  # find coords
+                my_color = re.findall(r'([BW])', my_buffer)  # find color
+                # print("my_coords = ", my_coords[0], "\n")
+                # print("my_color = ", my_color[0], "\n")
+                # print("my_buffer = ", my_buffer, "\n")
+                # self.my_color = re.search(r'([B\-W])', my_buffer).group(0)
+                # print("mycolor = ", self.my_color, "\n")
+                # print("my_coords= ", self.my_coords, "\n")
+                # if "(" + self.my_color[0] + "):" in my_buffer:
+                    # stringafterword = re.match("(?<=\(B\): )...", my_buffer)
+                    # if stringafterword:
+                    #     print(self.text1.insert(INSERT, stringafterword + "\n"))
+                self.put_stone(my_color[0], my_coords[0])
         self.root.after(2000, self.read_igs)
 
     def input_igs(self, event=None):
         self.tn.write(self.entry_name.get().encode('ascii') + b"\n")
+        if "observe" in self.entry_name.get():
+            print(self.text1.insert(INSERT, "====  putting in observe mode  ===="))
+            self.observe = True
         self.text1.see("end")
         self.entry_name.delete(0, 'end')
 
@@ -87,21 +118,39 @@ class App(object):
         for key in self.mydict:
             print("key=", key, "stuff=", self.mydict[key])
 
-    def del_stone(self):
-        move_coords = self.entry_name.get()
-        get_letter = (re.findall(r'([A-Z])', move_coords)[-1])
-        get_pos_y = (re.findall(r'(\d+)', move_coords)[-1])
+    def clean_board(self):
+        for stone in list(self.mydict.keys()):
+            get_letter = (re.findall(r'([A-Z])', stone )[-1])
+            get_pos_y = (re.findall(r'(\d+)', stone )[-1])
+            mykey = get_letter + get_pos_y
+            print("result2=", self.mydict[mykey])
+            self.canvas.delete(self.mydict[mykey])
+            del self.mydict[mykey]
+
+    def put_stone(self, color, coords):
+        # move_coords = self.entry_name.get()
+        get_letter = (re.findall(r'([A-Z])', coords)[-1])
+        get_pos_y = (re.findall(r'(\d+)', coords)[-1])
         mykey = get_letter + get_pos_y
-        print("result2=", self.mydict[mykey])
-        self.canvas.delete(self.mydict[mykey])
-        del self.mydict[mykey]
-        pass
+        res_x = int(self.letter_list.index(get_letter)) * 23 + 32
+        res_y = int(get_pos_y) * 23 + 32
+        # print("res_y = ", res_y, "\n")
+        # print(self.text1.insert(INSERT, "(" + color + ")" + coords + "\n"))
+        if mykey in self.mydict:
+            print("already exists!")
+        else:
+            if color is 'B':
+                self.mydict[mykey] = self.canvas.create_image(res_x, res_y, image=self.im_black)
+            else:
+                self.mydict[mykey] = self.canvas.create_image(res_x, res_y, image=self.im_white)
 
     def mouse_motion(self, event):
         if event.x >= 32 and event.y >= 32 and event.x <= 450 and event.y <= 450:
             x, y = event.x, event.y
             res_x = str(self.letter_list[(int(x / 23) - 1)])
             res_y = str(int((450 - y + 8) / 23) + 1)
+            self.res_x = res_x
+            self.res_y = res_y
             mystring = str(res_x + " x " + res_y)
             self.site_nubr = mystring
             self.label_mouse['text'] = self.site_nubr

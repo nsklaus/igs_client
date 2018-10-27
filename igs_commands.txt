@@ -36,6 +36,8 @@ coords	        index	        ranksupport   status
 
 
 
+
+
 ==========================
  in-game messages sample 1
 ==========================
