@@ -133,7 +133,9 @@ class App(object):
         get_pos_y = (re.findall(r'(\d+)', coords)[-1])
         mykey = get_letter + get_pos_y
         res_x = int(self.letter_list.index(get_letter)) * 23 + 32
-        res_y = int(get_pos_y) * 23 + 32
+        print("coords = ", coords, " get_pos_y = ", get_pos_y, "\n")
+        print((32 + (int(get_pos_y) * 23)))
+        res_y = 32 + ((19 - int(get_pos_y)) * 23)   # (32 + (int(get_pos_y) * 23))
         # print("res_y = ", res_y, "\n")
         # print(self.text1.insert(INSERT, "(" + color + ")" + coords + "\n"))
         if mykey in self.mydict:

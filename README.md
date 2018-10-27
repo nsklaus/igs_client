@@ -1,24 +1,16 @@
 # igs_client
 a go client for igs, made with python, tkinter, ttk  
-igs uses telnet, transmit data in clear.  
-this program will read telnet output and reproduce commands on the UI.  
-first goal is to make it able to observe other's games.    
-status: pre-alpha, work in progress  
-
-<img src="https://github.com/nsklaus/igs_client/blob/master/screenshot.png?raw=true" width="300" height="200">   
-
-#sample commands from igs:
-game number is 1  
-turn number is 82 then 83  
-black choose position T9  
-white choose position D7  
-<pre>  
-1 8  
-15 Game 1 I: alfred (0 559 24) vs maxwell (0 220 11)  
-15  82(B): T9  
+igs uses telnet and transmit data in clear.  
+see igs_commands.txt (more docs on igs protocol will be added later)  
   
-1 8  
-15 Game 1 I: alfred (0 545 23) vs maxwell (0 220 11)  
-15  83(W): D7  
-</pre>
+status: pre-alpha, work in progress, functionalities so far:  
+- able to join igs  
+- follow telnet session  
+- issue commands  
+- observe others games (not fully working yet, captures not implmented)  
+- place stones on the UI according to telnet output when observing games  
+- place stones on UI with the mouse when playing alone  
+- clear board when finished a game (alone or observed ones)  
+  
+<img src="https://github.com/nsklaus/igs_client/blob/master/screenshot.png?raw=true" width="300" height="200">  <img src="https://github.com/nsklaus/igs_client/blob/master/screenshot2.png?raw=true" width="300" height="200">  
 
