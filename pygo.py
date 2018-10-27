@@ -53,8 +53,8 @@ class App(object):
         self.text1.place(x=(goban_width + 5), y=0)
 
         self.entry_name = ttk.Entry(self.root, text=self.site_name, width=90)
-        # self.entry_name.insert(END, '15  83(W): D7')
         self.entry_name.place(x=470, y=goban_height + 35)
+        self.entry_name.bind('<Return>', self.input_igs)
 
         button_enter = ttk.Button(self.root, text='ok')
         button_enter['command'] = self.input_igs
@@ -69,17 +69,17 @@ class App(object):
         button_key.place(x=360, y=goban_height + 25)
         self.input_igs()
 
-    def get_output(self, my_buffer):
-        print(self.text1.insert(INSERT, "=== get_output function ===" + "\n"))
-        if my_buffer is not None:
-            for line in my_buffer.decode('ascii').split("\r\n"):
-                print(self.text1.insert(INSERT, line + '\n'))
+    def read_igs(self):
+        my_buffer = self.tn.read_very_eager().decode('ascii')
+        if len(my_buffer) > 0:
+            print(self.text1.insert(INSERT, my_buffer))
+            self.text1.see("end")
+        self.root.after(2000, self.read_igs)
 
-    def input_igs(self):
-        print(self.text1.insert(INSERT, "==== input_igs function ====" + '\n'))
+    def input_igs(self, event=None):
         self.tn.write(self.entry_name.get().encode('ascii') + b"\n")
-        time.sleep(1)
-        print(self.text1.insert(INSERT, self.tn.read_very_eager() + b'\n'))
+        self.text1.see("end")
+        self.entry_name.delete(0, 'end')
 
     def get_key(self):
         print("mydict_len=", len(self.mydict))
@@ -127,5 +127,6 @@ class App(object):
 
 
 app = App()
+app.root.after(1000, app.read_igs)
 app.root.mainloop()
 

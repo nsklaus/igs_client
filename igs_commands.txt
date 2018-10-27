@@ -3,8 +3,10 @@
 ====================
 
 
-toggle verbose true --> display goboard in ascii
-toggle quiet        --> suppress messages spamming
+toggle verbose true     --> display goboard in ascii
+toggle quiet            --> suppress messages spamming
+observe <game number>   --> watch others games
+moves <game number>     --> list all the moves so far
 
 
 #> help commands
@@ -31,6 +33,106 @@ choice	        help	        psmail	      shogirules1     watching
 client	        igs	          quit	        shout	    who
 commands        IGStitles     rank	        stats	    yell
 coords	        index	        ranksupport   status
+
+
+
+==========================
+ in-game messages sample 1
+==========================
+
+1 8
+15 Game 74 I: alfred (3 454 14) vs maxwell (9 519 18)
+15 241(W): H19
+
+1 8
+15 Game 74 I: alfred (3 454 14) vs maxwell (9 513 17)
+15 242(B): H11
+
+
+==========================
+ in-game messages sample 2
+==========================
+1 8
+15 Game 656 I: Maruhide (13 527 8) vs sasaki3 (15 520 18)
+15 263(W): K1 J1
+
+1 8
+15 Game 656 I: Maruhide (13 527 8) vs sasaki3 (16 518 17)
+15 264(B): B19 C19
+
+1 8
+15 Game 656 I: Maruhide (13 518 7) vs sasaki3 (16 518 17)
+15 265(W): A18
+
+1 8
+15 Game 656 I: Maruhide (13 518 7) vs sasaki3 (16 515 16)
+15 266(B): C19
+
+1 8
+15 Game 656 I: Maruhide (13 517 6) vs sasaki3 (16 515 16)
+15 267(W): E12
+
+1 8
+15 Game 656 I: Maruhide (13 517 6) vs sasaki3 (16 513 15)
+15 268(B): F11
+
+1 8
+15 Game 656 I: Maruhide (13 517 5) vs sasaki3 (16 513 15)
+15 269(W): Pass
+
+1 8
+15 Game 656 I: Maruhide (13 517 5) vs sasaki3 (16 513 14)
+15 270(B): Pass
+
+1 8
+15 Game 656 I: Maruhide (13 517 5) vs sasaki3 (16 513 14)
+15 271(W): Pass
+
+1 8
+22 Maruhide 6k* 15 517 5 T 0.5 2
+22 sasaki3 7k* 18 513 14 T 0.5 2
+22  0: 1111011144444444444
+22  1: 0110010111114444141
+22  2: 0013000100101111110
+22  3: 0011000000000000000
+22  4: 0010011105555501105
+22  5: 5011144100055501000
+22  6: 0501444410555501110
+22  7: 0001444141055014141
+22  8: 1114444441055011414
+22  9: 4414444444100000141
+22 10: 4444111111113311444
+22 11: 4414100010013311144
+22 12: 4141050505000000114
+22 13: 1141000050001105011
+22 14: 0111105050100130010
+22 15: 0010000501111111000
+22 16: 5000550011144100505
+22 17: 5555000114444105055
+22 18: 5555011144444110505
+9 {Game 656: Maruhide vs sasaki3 : W 88.5 B 63.0}
+1 8
+
+
+
+
+==========================
+ list all previous moves
+==========================
+15   0(B): Q16
+15   1(W): D4
+15   2(B): R4
+15   3(W): D16
+15   4(B): O3
+15   5(W): G16
+15   6(B): L17
+15   7(W): D10
+15   8(B): C13
+15   9(W): C11
+15  10(B): B16
+15  11(W): B17
+15  12(B): C16
+
 
 
 
@@ -354,29 +456,7 @@ help Summary
 
  If this document is too long for your terminal, use:  mail me Summary
 
-==========================
- in-game messages sample 1
-==========================
 
-1 8
-15 Game 74 I: alfred (3 454 14) vs maxwell (9 519 18)
-15 241(W): H19
-
-1 8
-15 Game 74 I: alfred (3 454 14) vs maxwell (9 513 17)
-15 242(B): H11
-
-
-==========================
- in-game messages sample 2
-==========================
-1 8  
-15 Game 1 I: bleh (0 559 24) vs grmbl (0 220 11)  
-15  82(B): T9  
-  
-1 8  
-15 Game 1 I: bleh (0 545 23) vs grmbl (0 220 11)  
-15  83(W): D7  
 
 
 
