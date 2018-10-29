@@ -2,7 +2,7 @@
 
 import tkinter
 from tkinter import *
-from tkinter import ttk
+from tkinter import ttk, scrolledtext as sText
 import telnetlib
 import time
 import re
@@ -12,9 +12,9 @@ class App(object):
 
     def __init__(self):
         self.root = tkinter.Tk()
-        self.frame_main = Frame(self.root, bg="gray")
+        # self.frame_main = Frame(self.root, bg="gray")
         # self.frame_main.pack()
-        self.canvas = Canvas(self.root, width=1100, height=540)
+        self.canvas = Canvas(self.root, width=1120, height=470)
 
         self.canvas.grid()
         self.canvas.bind("<Button-1>", self.mouse_click)
@@ -52,14 +52,14 @@ class App(object):
         goban_height = (self.im_goban.height())
         self.canvas.create_image(goban_width / 2, goban_height / 2, image=self.im_goban)
 
-        self.label_mouse = ttk.Label(self.root, text=str(self.site_nubr))
-        self.label_mouse.place(x=10, y=goban_height + 20)
+        # self.label_mouse = ttk.Label(self.root, text=str(self.site_nubr))
+        # self.label_mouse.place(x=1024, y=5)
 
-        self.text1 = Text(self.root, height=30, width=80)
-        self.text1.place(x=(goban_width + 5), y=0)
-        self.vsb = ttk.Scrollbar(self.root, orient="vertical", command=self.text1.yview)
-        self.vsb.grid(column=1, row=0, sticky='ns')
-        self.text1.configure(yscrollcommand=self.vsb.set)
+        # self.text1 = Text(self.root, height=30, width=80)
+        # self.text1.place(x=(goban_width + 5), y=0)
+        # self.vsb = ttk.Scrollbar(self.root, orient="vertical", command=self.text1.yview)
+        # self.vsb.grid(column=1, row=0, sticky='ns')
+        # self.text1.configure(yscrollcommand=self.vsb.set)
 
         # self.textframe = Text(self.root, bd=2, bg='#CEF6EC', relief=RAISED)
         # self.txscroll = ttk.Scrollbar(self.root, orient=VERTICAL, command=self.textframe.yview)
@@ -67,25 +67,37 @@ class App(object):
         # self.textframe.configure(yscroll=self.txscroll.set)
         # self.textframe.grid(row=0, column=0, padx=2, pady=2)
 
+        self.text1 = sText.ScrolledText(self.root, height=23)
+        self.text1.place(x=(goban_width + 5), y=55)
+        # make self.text1 readonly
+        # TODO toggle readonly when going offline/online
+        self.text1.bind("<Key>", lambda e: "break")
+        self.text1.bind("<Button-1>", lambda e: "break")
+        self.text1.bind("<Motion>", lambda e: "break")
+
         self.entry_name = ttk.Entry(self.root, text=self.site_name, width=90)
-        self.entry_name.place(x=470, y=goban_height + 35)
+        self.entry_name.place(x=470, y=goban_height - 20)
         self.entry_name.bind('<Return>', self.input_igs)
 
-        self.button_enter = ttk.Button(self.root, text='Online')
+        self.button_enter = ttk.Button(self.root, text='Online', width=8)
         self.button_enter['command'] = self.toggle_net
-        self.button_enter.place(x=60, y=goban_height + 25)
+        self.button_enter.place(x=goban_width + 5, y=10)
 
-        button_enter = ttk.Button(self.root, text='disconnect')
+        button_enter = ttk.Button(self.root, text='match', width=8, state='disabled')
         button_enter['command'] = self.input_igs
-        button_enter.place(x=160, y=goban_height + 25)
+        button_enter.place(x=goban_width + 85, y=10)
 
-        button_rem = ttk.Button(self.root, text='clean')
+        button_rem = ttk.Button(self.root, text='clean', width=8)
         button_rem['command'] = self.clean_board
-        button_rem.place(x=260, y=goban_height + 25)
+        button_rem.place(x=goban_width + 165, y=10)
 
-        button_key = ttk.Button(self.root, text='key')
+        button_key = ttk.Button(self.root, text='settings', state='disabled')
         button_key['command'] = self.get_key
-        button_key.place(x=360, y=goban_height + 25)
+        button_key.place(x=goban_width + 245, y=10)
+
+        button_key = ttk.Button(self.root, text='debug', width=8)
+        button_key['command'] = self.get_key
+        button_key.place(x=goban_width + 345, y=10)
 
     def toggle_net(self):
         if self.button_enter["text"] == "Online":
@@ -123,26 +135,16 @@ class App(object):
 
                 if self.observe:
                     # TODO: when starting to observe, loop first through previous moves (moves <game_id>)
-                    # TODO: make it a true list, not fixed to [0], then loop on the list to treat captures
-                    # TODO: investigate some moves are listed from buffer but not replicated on the UI (bad regex?)
-                    # my_bufferz = "15  51(W): T15 S14 S15"
                     my_coords = re.findall(r'(?<=\([B-W]\):.).*', my_buffer)  # find coords
                     my_color = re.findall(r'([BW])', my_buffer)  # find color
 
                     if not my_color and not my_coords:
                         pass
-                    else:
-                        # print("my_buffer=", my_buffer, "\n")
-                        # print("my_buffer type=", type(my_buffer), "\n")
-                        # print("my_coords=", my_coords, "\n")
-                        # print("my_coords type=", type(my_coords), "\n")
+                    # TODO: Handle Handicap string: "15   0(B): Handicap 2"
+                    else:  # if "Handicap" not in my_coords[0]:
                         my_temp = re.sub(r'\r', '', my_coords[0])
                         my_temp = my_temp.split( )
                         my_move = my_temp[0]
-                        # print("my_temp=", my_temp, "\n")
-                        # print("my_temp type=", type(my_temp), "\n")
-                        # print("my_move=", my_move, "\n")
-                        # print("my_move type=", type(my_move), "\n")
                         del my_temp[0]
                         if len(my_temp) > 0:
                             self.del_stone(my_temp)
@@ -153,6 +155,7 @@ class App(object):
     def input_igs(self, event=None):
         if self.status == "Online":
             self.tn.write(self.entry_name.get().encode('ascii') + b"\n")
+            self.text1.insert(INSERT, self.entry_name.get().encode('ascii') + b"\n")
             if "observe" in self.entry_name.get():
                 self.observe = True
             self.text1.see("end")
@@ -179,9 +182,6 @@ class App(object):
             del self.mydict[stone]
 
     def put_stone(self, color, coords):
-        # get_letter = (re.findall(r'([A-Z])', coords)[-1])
-        # get_pos_y = (re.findall(r'(\d+)', coords)[-1])
-
         get_letter = re.sub('[^A-Za-z]', '', coords)
         get_pos_y = re.sub('[^0-9]', '', coords)
         mykey = get_letter + get_pos_y
@@ -203,9 +203,9 @@ class App(object):
             res_y = str(int((450 - y + 8) / 23) + 1)
             self.res_x = res_x
             self.res_y = res_y
-            mystring = str(res_x + " x " + res_y)
-            self.site_nubr = mystring
-            self.label_mouse['text'] = self.site_nubr
+            # mystring = str(res_x + " x " + res_y)
+            # self.site_nubr = mystring
+            # # self.label_mouse['text'] = self.site_nubr
             self.last_x = res_x
             self.last_y = res_y
 
@@ -230,4 +230,5 @@ class App(object):
 app = App()
 app.root.after(1000, app.read_igs)
 app.root.mainloop()
+
 
