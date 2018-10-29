@@ -125,13 +125,29 @@ class App(object):
                     # TODO: when starting to observe, loop first through previous moves (moves <game_id>)
                     # TODO: make it a true list, not fixed to [0], then loop on the list to treat captures
                     # TODO: investigate some moves are listed from buffer but not replicated on the UI (bad regex?)
-                    my_coords = re.findall(r'(?<=\([B-W]\):.).\d+', my_buffer)  # find coords
+                    # my_bufferz = "15  51(W): T15 S14 S15"
+                    my_coords = re.findall(r'(?<=\([B-W]\):.).*', my_buffer)  # find coords
                     my_color = re.findall(r'([BW])', my_buffer)  # find color
-                    if not my_color or not my_coords:
+
+                    if not my_color and not my_coords:
                         pass
                     else:
-                        print("my_buffer=[", my_buffer, "]\n")
-                        self.put_stone(my_color[0], my_coords[0])
+                        # print("my_buffer=", my_buffer, "\n")
+                        # print("my_buffer type=", type(my_buffer), "\n")
+                        # print("my_coords=", my_coords, "\n")
+                        # print("my_coords type=", type(my_coords), "\n")
+                        my_temp = re.sub(r'\r', '', my_coords[0])
+                        my_temp = my_temp.split( )
+                        my_move = my_temp[0]
+                        # print("my_temp=", my_temp, "\n")
+                        # print("my_temp type=", type(my_temp), "\n")
+                        # print("my_move=", my_move, "\n")
+                        # print("my_move type=", type(my_move), "\n")
+                        del my_temp[0]
+                        if len(my_temp) > 0:
+                            self.del_stone(my_temp)
+                            pass
+                        self.put_stone(my_color[0], my_move)
             self.root.after(2000, self.read_igs)
 
     def input_igs(self, event=None):
@@ -163,8 +179,11 @@ class App(object):
             del self.mydict[stone]
 
     def put_stone(self, color, coords):
-        get_letter = (re.findall(r'([A-Z])', coords)[-1])
-        get_pos_y = (re.findall(r'(\d+)', coords)[-1])
+        # get_letter = (re.findall(r'([A-Z])', coords)[-1])
+        # get_pos_y = (re.findall(r'(\d+)', coords)[-1])
+
+        get_letter = re.sub('[^A-Za-z]', '', coords)
+        get_pos_y = re.sub('[^0-9]', '', coords)
         mykey = get_letter + get_pos_y
         res_x = int(self.letter_list.index(get_letter)) * 23 + 32  # letter_index * offset + bordersize
         res_y = 32 + ((19 - int(get_pos_y)) * 23)  # bordersize + (boardsize - letter) * offset
