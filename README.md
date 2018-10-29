@@ -17,7 +17,7 @@ status: pre-alpha, work in progress, functionalities so far:
 - wait for IGS welcome message and login prompt
 - type in your ID (if already registered or else some guest ID)
 - after IGS validate your registered ID (with prompt "1 1") type in your password
-- issues commands, like: "games" to see a list of active games and then "observe <game number>"
+- issues commands, like: `games` to see a list of active games and then `observe 41` to observe game 41.
 
 known issues:  
 connection dropped after while watching a game, i don't know why yet.  
