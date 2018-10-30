@@ -2,23 +2,27 @@
 
 import tkinter
 from tkinter import *
-from tkinter import ttk, scrolledtext as sText
+from tkinter import ttk, scrolledtext as stext
 import telnetlib
 import time
 import re
+
+# TODO: save corrected buffer to be able to replay forward and backward the game
+# TODO: label to show player names, rank, captures
 
 
 class App(object):
 
     def __init__(self):
+
         self.root = tkinter.Tk()
-        # self.frame_main = Frame(self.root, bg="gray")
-        # self.frame_main.pack()
-        self.canvas = Canvas(self.root, width=1120, height=470)
+        self.canvas = Canvas(self.root, width=485, height=540)
 
         self.canvas.grid()
         self.canvas.bind("<Button-1>", self.mouse_click)
         self.canvas.bind('<Motion>', self.mouse_motion)
+        self.window = tkinter.Toplevel(self.root, width=665, height=480)
+        self.window.withdraw()
         self.style = ttk.Style()
         self.style.theme_use('clam')
         self.root.title('go client')
@@ -34,6 +38,7 @@ class App(object):
         self.my_color = []
         self.observe = False
         self.turn = True
+        self.lastmove = ""
         self.status = "Offline"
 
         self.site_name = StringVar()
@@ -44,60 +49,48 @@ class App(object):
         self.letter_list = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K',
                             'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
 
-        self.im_goban = PhotoImage(file="images/goban2.png")
+        self.im_goban = PhotoImage(file="images/goban3.png")
         self.im_white = PhotoImage(file="images/white.png")
         self.im_black = PhotoImage(file="images/black.png")
+        self.im_lastm = PhotoImage(file="images/last.png")
 
         goban_width = (self.im_goban.width())
         goban_height = (self.im_goban.height())
-        self.canvas.create_image(goban_width / 2, goban_height / 2, image=self.im_goban)
+        self.canvas.create_image((goban_width / 2) , (goban_height / 2), image=self.im_goban)
 
-        # self.label_mouse = ttk.Label(self.root, text=str(self.site_nubr))
-        # self.label_mouse.place(x=1024, y=5)
-
-        # self.text1 = Text(self.root, height=30, width=80)
-        # self.text1.place(x=(goban_width + 5), y=0)
-        # self.vsb = ttk.Scrollbar(self.root, orient="vertical", command=self.text1.yview)
-        # self.vsb.grid(column=1, row=0, sticky='ns')
-        # self.text1.configure(yscrollcommand=self.vsb.set)
-
-        # self.textframe = Text(self.root, bd=2, bg='#CEF6EC', relief=RAISED)
-        # self.txscroll = ttk.Scrollbar(self.root, orient=VERTICAL, command=self.textframe.yview)
-        # self.txscroll.grid(row=0, column=1, sticky='ns')
-        # self.textframe.configure(yscroll=self.txscroll.set)
-        # self.textframe.grid(row=0, column=0, padx=2, pady=2)
-
-        self.text1 = sText.ScrolledText(self.root, height=23)
-        self.text1.place(x=(goban_width + 5), y=55)
+        # ============== IGS term window =============
+        self.text1 = stext.ScrolledText(self.window, height=23)
+        self.text1.place(x=5, y=40)
+        # TODO toggle readonly when going offline/online (allow copy/paste/edit only when offline)
         # make self.text1 readonly
-        # TODO toggle readonly when going offline/online
         self.text1.bind("<Key>", lambda e: "break")
         self.text1.bind("<Button-1>", lambda e: "break")
         self.text1.bind("<Motion>", lambda e: "break")
 
-        self.entry_name = ttk.Entry(self.root, text=self.site_name, width=90)
-        self.entry_name.place(x=470, y=goban_height - 20)
+        self.entry_name = ttk.Entry(self.window, text=self.site_name, width=90)
+        self.entry_name.place(x=5, y=goban_height - 35)
         self.entry_name.bind('<Return>', self.input_igs)
 
+        button_enter = ttk.Button(self.window, text='match', width=8, state='disabled')
+        button_enter['command'] = self.input_igs
+        button_enter.place(x=5, y=5)
+
+        # ============== main window ==============
         self.button_enter = ttk.Button(self.root, text='Online', width=8)
         self.button_enter['command'] = self.toggle_net
-        self.button_enter.place(x=goban_width + 5, y=10)
-
-        button_enter = ttk.Button(self.root, text='match', width=8, state='disabled')
-        button_enter['command'] = self.input_igs
-        button_enter.place(x=goban_width + 85, y=10)
+        self.button_enter.place(x=5, y=goban_height + 5)
 
         button_rem = ttk.Button(self.root, text='clean', width=8)
         button_rem['command'] = self.clean_board
-        button_rem.place(x=goban_width + 165, y=10)
+        button_rem.place(x=85, y=goban_height + 5)
 
         button_key = ttk.Button(self.root, text='settings', state='disabled')
         button_key['command'] = self.get_key
-        button_key.place(x=goban_width + 245, y=10)
+        button_key.place(x=165, y=goban_height + 5)
 
         button_key = ttk.Button(self.root, text='debug', width=8)
         button_key['command'] = self.get_key
-        button_key.place(x=goban_width + 345, y=10)
+        button_key.place(x=265, y=goban_height + 5)
 
     def toggle_net(self):
         if self.button_enter["text"] == "Online":
@@ -109,6 +102,7 @@ class App(object):
 
     def go_online(self):
         self.status = "Online"
+        self.window.deiconify()
         self.text1.insert(INSERT, "\n" + " === Connecting to IGS ===" + "\n\n")
         self.tn = telnetlib.Telnet(self.HOST, self.PORT)
         self.read_igs()
@@ -123,6 +117,7 @@ class App(object):
         except EOFError as e:
             self.text1.insert(INSERT, str(e))
         self.text1.see("end")
+        self.window.withdraw()
 
     def read_igs(self):
         if self.status == "Online":
@@ -134,6 +129,7 @@ class App(object):
                 self.text1.see("end")
 
                 if self.observe:
+                    # TODO: remove observing status over 'adjourned' message in bufffer
                     # TODO: when starting to observe, loop first through previous moves (moves <game_id>)
                     my_coords = re.findall(r'(?<=\([B-W]\):.).*', my_buffer)  # find coords
                     my_color = re.findall(r'([BW])', my_buffer)  # find color
@@ -148,7 +144,7 @@ class App(object):
                         del my_temp[0]
                         if len(my_temp) > 0:
                             self.del_stone(my_temp)
-                            pass
+
                         self.put_stone(my_color[0], my_move)
             self.root.after(2000, self.read_igs)
 
@@ -191,10 +187,13 @@ class App(object):
             print("already exists!")
             # self.del_stone(mykey)
         else:
+            if len(self.mydict) > 0:
+                self.canvas.delete(self.lastmove)
             if color is 'B':
                 self.mydict[mykey] = self.canvas.create_image(res_x, res_y, image=self.im_black)
             else:
                 self.mydict[mykey] = self.canvas.create_image(res_x, res_y, image=self.im_white)
+            self.lastmove = self.canvas.create_image(res_x, res_y, image=self.im_lastm)
 
     def mouse_motion(self, event):
         if event.x >= 32 and event.y >= 32 and event.x <= 450 and event.y <= 450:
@@ -203,9 +202,6 @@ class App(object):
             res_y = str(int((450 - y + 8) / 23) + 1)
             self.res_x = res_x
             self.res_y = res_y
-            # mystring = str(res_x + " x " + res_y)
-            # self.site_nubr = mystring
-            # # self.label_mouse['text'] = self.site_nubr
             self.last_x = res_x
             self.last_y = res_y
 
@@ -220,11 +216,15 @@ class App(object):
             temp_list = [mykey]
             self.del_stone(temp_list)
         else:
+            if len(self.mydict) > 0:
+                self.canvas.delete(self.lastmove)
             if self.turn:
                 self.mydict[mykey] = self.canvas.create_image(rel_pos_x, rel_pos_y, image=self.im_black)
             else:
                 self.mydict[mykey] = self.canvas.create_image(rel_pos_x, rel_pos_y, image=self.im_white)
             self.turn = not self.turn
+
+            self.lastmove = self.canvas.create_image(rel_pos_x, rel_pos_y, image=self.im_lastm)
 
 
 app = App()
