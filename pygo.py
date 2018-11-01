@@ -9,6 +9,10 @@ import re
 
 # TODO: save corrected buffer to be able to replay forward and backward the game
 # TODO: label to show player names, rank, captures
+# TODO: Handle Handicap string: "15   0(B): Handicap 2"
+# TODO: remove observing status over 'adjourned' message in bufffer
+# TODO toggle readonly when going offline/online (allow copy/paste/edit only when offline)
+# TODO: investigate dockable widgets
 
 
 class App(object):
@@ -16,7 +20,7 @@ class App(object):
     def __init__(self):
 
         self.root = tkinter.Tk()
-        self.canvas = Canvas(self.root, width=485, height=540)
+        self.canvas = Canvas(self.root, width=640, height=480)
 
         self.canvas.grid()
         self.canvas.bind("<Button-1>", self.mouse_click)
@@ -70,7 +74,6 @@ class App(object):
         # print(dir(stext.ScrolledText()))
         # self.text1.place(x=5, y=40)
         self.text1.grid(row=0, column=0, sticky=N + S + W + E)
-        # TODO toggle readonly when going offline/online (allow copy/paste/edit only when offline)
         # make self.text1 readonly
         self.text1.bind("<Key>", lambda e: "break")
         self.text1.bind("<Button-1>", lambda e: "break")
@@ -87,21 +90,31 @@ class App(object):
         # button_enter.place(x=5, y=5)
 
         # ============== main window ==============
-        self.button_status = ttk.Button(self.root, text='Online', width=8)
+        self.label_player1 = Text(self.root, width=17, height=4)
+        self.label_player1.insert(END, '(B) alfred  [5k]\n captures: 00\n time:0:00')
+        self.label_player1.bind("<Button-1>", lambda e: "break")
+        self.label_player1.place(x=goban_width + 5, y=5)
+
+        self.label_player2 = Text(self.root, width=17, height=4)
+        self.label_player2.insert(END, '(W) maxwell  [6k]\n captures: 00\n time:0:00')
+        self.label_player2.bind("<Button-1>", lambda e: "break")
+        self.label_player2.place(x=goban_width + 5, y=100)
+
+        self.button_status = ttk.Button(self.root, text='Online', width=18)
         self.button_status['command'] = self.toggle_net
-        self.button_status.place(x=5, y=goban_height + 5)
+        self.button_status.place(x=goban_width + 5, y=goban_height - 135)
 
-        button_rem = ttk.Button(self.root, text='clean')
-        button_rem['command'] = self.clean_board
-        button_rem.place(x=85, y=goban_height + 5)
-
-        button_settings = ttk.Button(self.root, text='settings', state='disabled')
+        button_settings = ttk.Button(self.root, text='settings', width=18, state='disabled')
         button_settings['command'] = self.settings
-        button_settings.place(x=165, y=goban_height + 5)
+        button_settings.place(x=goban_width + 5, y=goban_height - 100)
 
-        button_debug = ttk.Button(self.root, text='debug', width=8)
+        button_rem = ttk.Button(self.root, text='clean', width=18)
+        button_rem['command'] = self.clean_board
+        button_rem.place(x=goban_width + 5, y=goban_height - 65)
+
+        button_debug = ttk.Button(self.root, text='debug', width=18)
         button_debug['command'] = self.get_debug
-        button_debug.place(x=265, y=goban_height + 5)
+        button_debug.place(x=goban_width + 5, y=goban_height - 30)
 
     def toggle_net(self):
         if self.button_status["text"] == "Online":
@@ -141,12 +154,10 @@ class App(object):
                 else:
                     self.my_buffer = my_buffer
                     self.write_term(my_buffer)
-                    # TODO: remove observing status over 'adjourned' message in bufffer
-                    # TODO: when starting to observe, loop first through previous moves (moves <game_id>)
-
             self.root.after(2000, self.read_igs)
 
     def observe_logic(self):
+        # TODO: clean duplicate code
         if self.check_previous_moves:
             observe_string = "moves " + self.observe_number[0]
             self.tn.write(observe_string.encode('ascii') + b"\n")
@@ -159,41 +170,23 @@ class App(object):
             # print("normal finalizing with = ", my_color, " ", my_coords)
             if not my_color and not my_coords:
                 pass
-            # TODO: Handle Handicap string: "15   0(B): Handicap 2"
             else:
                 self.finalize_string(my_color, my_coords)
             self.check_previous_moves = False
         else:
-            # print("\n ==================\n my_buffer= ", self.my_buffer, "\n")
-            # for line in self.my_buffer.split("\r\n"):
-            #     my_coords = re.findall(r'(?<=\([B-W]\):.).*', line)  # find coords
-            #     my_color = re.findall(r'([BW])', line)  # find color
-            #     print("loop finalizing with = ", my_color, " ", my_coords)
-            #     self.finalize_string(my_color, my_coords)
-
             my_buffer = self.tn.read_very_eager().decode('ascii')
             self.write_term(my_buffer)
 
             my_coords = re.findall(r'(?<=\([B-W]\):.).*', my_buffer)  # find coords
             my_color = re.findall(r'([BW])', my_buffer)  # find color
-            # print("normal finalizing with = ", my_color, " ", my_coords)
             if not my_color and not my_coords:
                 pass
-            # TODO: Handle Handicap string: "15   0(B): Handicap 2"
             else:
                 self.finalize_string(my_color, my_coords)
 
     def finalize_string(self, my_color, my_coords):
-        # print("type(my_color= ", type(my_color))
-        # print("type(my_coords= ", type(my_coords))
-        # print("my_color= ", my_color)
-        # print("my_coords= ", my_coords)
-        # my_string = my_color, " ", my_coords, "\n"
-        # self.text1.insert(INSERT, my_string)
-        # self.text1.see("end")
-
+        # TODO: both lists are not always the same size, that's bad.
         for index in range(len(my_coords)):
-
             my_temp = re.sub(r'\r', '', my_coords[index])
             my_temp = my_temp.split()
             my_move = my_temp[0]
@@ -201,20 +194,6 @@ class App(object):
             if len(my_temp) > 0:
                 self.del_stone(my_temp)
             self.put_stone(my_color[index], my_move)
-
-        # for color in my_color:
-        #     for coords in my_coords:
-        #         my_string = "color=", color, "coords=", coords, "type(coords)=", type(coords), "\n"
-        #         self.text1.insert(INSERT, my_string)
-        #         self.text1.see("end")
-        #         # print("color=", color, "coords=", coords, "\n")
-        #         my_temp = re.sub(r'\r', '', my_coords[0])
-        #         my_temp = my_temp.split()
-        #         my_move = my_temp[0]
-        #         del my_temp[0]
-        #         if len(my_temp) > 0:
-        #             self.del_stone(my_temp)
-        #         self.put_stone(my_color[0], my_move)
 
     def input_igs(self, event=None):
         if self.status == "Online":
@@ -273,8 +252,6 @@ class App(object):
         res_x = int(self.letter_list.index(get_letter)) * 23 + 32  # letter_index * offset + bordersize
         res_y = 32 + ((19 - int(get_pos_y)) * 23)  # bordersize + (boardsize - letter) * offset
         if mykey in self.mydict:
-            # print("already exists!")
-            # self.del_stone(mykey)
             pass
         else:
             if len(self.mydict) > 0:
