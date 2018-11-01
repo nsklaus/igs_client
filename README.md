@@ -23,5 +23,5 @@ known issues:
 connection dropped after while watching a game, i don't know why yet.  
 you can issue command 'ayt' to ask IGS if you're still connected, that should prevent a connection drop from inactivity.  
   
-<img src="https://github.com/nsklaus/igs_client/blob/master/screenshot.png?raw=true" width="300" height="200">  <img src="https://github.com/nsklaus/igs_client/blob/master/screenshot2.png?raw=true" width="300" height="200">  
+<img src="https://github.com/nsklaus/igs_client/blob/master/screenshot.png?raw=true" width="300" height="200">  <img src="https://github.com/nsklaus/igs_client/blob/master/screenshot2.png?raw=true" width="360" height="200">  
 
